@@ -1,3 +1,4 @@
+#include "color.h"
 #include <iostream>
 
 int main() {
@@ -15,11 +16,7 @@ int main() {
       float g = float(j) / (image_height - 1);
       float b = 0.25;
 
-      int ir = static_cast<int>(255.999 * r);
-      int ig = static_cast<int>(255.999 * g);
-      int ib = static_cast<int>(255.999 * b);
-
-      std::cout << ir << ' ' << ig << ' ' << ib << std::endl;
+      write_color(std::cout, {r, g, b});
     }
   }
   std::cerr << std::endl << "Done!" << std::endl;
