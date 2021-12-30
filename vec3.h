@@ -51,7 +51,7 @@ public:
   float e[3];
 };
 
-using point = vec3;
+using point3 = vec3;
 using color = vec3;
 
 

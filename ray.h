@@ -13,19 +13,19 @@ public:
   }
 
   ray(const point3& origin, const vec3& direction)
-    : origin(origin), direction(direction) {
+    : orig(origin), dir(direction) {
 
   }
 
-  point3 origin() const { return origin; }
+  point3 origin() const { return orig; }
 
-  vec3 direction() const { return direction; }
+  vec3 direction() const { return dir; }
 
   point3 at(float t) {
-    return origin + t * direction;
+    return orig + t * dir;
   }
 
 public:
-  point3 origin;
-  vec3 direction;
+  point3 orig;
+  vec3 dir;
 };
