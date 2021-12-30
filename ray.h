@@ -21,7 +21,7 @@ public:
 
   vec3 direction() const { return dir; }
 
-  point3 at(float t) {
+  point3 at(float t) const {
     return orig + t * dir;
   }
 
