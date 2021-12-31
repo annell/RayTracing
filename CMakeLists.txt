@@ -3,4 +3,8 @@ project(RayTracing)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(RayTracing main.cpp sphere.cpp)
+add_executable(RayTracing
+        main.cpp
+        sphere.cpp
+        hittable_list.cpp
+        )

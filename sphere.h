@@ -16,7 +16,7 @@ public:
     : center(center), radius(radius) {
   }
 
-  bool hit(const ray& r, float t_min, float t_max, hit_record& rec) override;
+  bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
 public:
   point3 center;
   float radius;
