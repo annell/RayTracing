@@ -25,6 +25,11 @@ public:
   float y() const { return e[1]; }
   float z() const { return e[2]; }
 
+  bool near_zero() const {
+    const auto s = 1e-8;
+    return (fabs(e[0] < s)) && (fabs(e[1] < s)) && (fabs(e[2] < s));
+  }
+
   vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 
   float operator[](int i) const { return e[i]; }
@@ -126,4 +131,8 @@ inline vec3 random_in_hemisphere(const vec3& normal) {
     return in_unit_sphere;
   }
   return -in_unit_sphere;
+}
+
+inline vec3 reflect(const vec3& v, const vec3& n) {
+  return v - 2 * dot(v, n) * n;
 }
