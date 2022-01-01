@@ -8,7 +8,13 @@
 
 class camera {
 public:
-  camera();
+  camera(
+      point3 lookfrom,
+      point3 lookat,
+      vec3 vup,
+      float vfov,
+      float aspect_ratio
+      );
 
   ray get_ray(float u, float v) const;
 
