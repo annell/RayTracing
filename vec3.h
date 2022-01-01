@@ -4,13 +4,22 @@
 
 #pragma once
 
-#include <math.h>
+#include "rtweekend.h"
 #include <iostream>
+#include <math.h>
 
 class vec3 {
 public:
   vec3() : vec3(0, 0, 0) {}
   vec3(float e0, float e1, float e2) : e{e0, e1, e2} {}
+
+  inline static vec3 random() {
+    return vec3(random_float(), random_float(), random_float());
+  }
+
+  inline static vec3 random(float min, float max) {
+    return vec3(random_float(min, max), random_float(min, max), random_float(min, max));
+  }
 
   float x() const { return e[0]; }
   float y() const { return e[1]; }
@@ -99,3 +108,22 @@ inline vec3 unit_vector(vec3 v) {
   return v / v.length();
 }
 
+inline vec3 random_in_unit_sphere() {
+  while (true) {
+    vec3 p = vec3::random(-1, 1);
+    if (p.length_squared() >= 1) continue;
+    return p;
+  }
+}
+
+inline vec3 random_unit_vector() {
+  return unit_vector(random_in_unit_sphere());
+}
+
+inline vec3 random_in_hemisphere(const vec3& normal) {
+  vec3 in_unit_sphere = random_in_unit_sphere();
+  if (dot(in_unit_sphere, normal) > 0.0) {
+    return in_unit_sphere;
+  }
+  return -in_unit_sphere;
+}
