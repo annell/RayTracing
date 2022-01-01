@@ -13,7 +13,9 @@ public:
       point3 lookat,
       vec3 vup,
       float vfov,
-      float aspect_ratio
+      float aspect_ratio,
+      float aperture,
+      float focus_dist
       );
 
   ray get_ray(float u, float v) const;
@@ -23,4 +25,6 @@ private:
   point3 lower_left_corner;
   vec3 horizontal;
   vec3 vertical;
+  vec3 u, v, w;
+  float lens_radius;
 };
