@@ -44,7 +44,7 @@ hittable_list random_scene() {
 
         if (choose_mat < 0.7) {
           auto albedo = color::random() * color::random();
-          sphere_material = std::make_shared<emissive>(albedo, random_float(0.5, 20));
+          sphere_material = std::make_shared<emissive>(albedo, random_float(0.5, 2));
           world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
         }
         else if (choose_mat < 0.8) {
@@ -84,7 +84,7 @@ int main() {
   const float aspect_ratio = 3.0 / 2.0;
   const int image_width = 1280;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 100;
+  const int samples_per_pixel = 500;
   const int max_depth = 10;
 
   // World
@@ -98,6 +98,12 @@ int main() {
   auto aperture = 0.1;
 
   camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+
+  using std::chrono::high_resolution_clock;
+  using std::chrono::duration;
+  using std::chrono::milliseconds;
+
+  auto t1 = high_resolution_clock::now();
 
   auto pixelTask = [&] (int i, int j) {
     color pixel_color(0, 0, 0);
@@ -116,7 +122,7 @@ int main() {
   for (int j = image_height - 1; j >= 0; j--) {
     std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
     for (int i = 0; i < image_width; i++) {
-      threads.emplace_back(std::async(std::launch::async, pixelTask, i, j));
+      threads.emplace_back(std::async(std::launch::deferred, pixelTask, i, j));
     }
   }
   int i = 0;
@@ -126,7 +132,12 @@ int main() {
     thread.wait();
     write_color(std::cout, thread.get(), samples_per_pixel);
   }
+
+  auto t2 = high_resolution_clock::now();
+
+  duration<double, std::milli> ms_double = t2 - t1;
   std::cerr << std::endl << "Done!" << std::endl;
+  std::cerr << ms_double.count() << "ms\n";
 
   return 0;
 }

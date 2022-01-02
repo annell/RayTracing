@@ -15,6 +15,8 @@ inline double degrees_to_radians(float degrees) {
   return degrees * pi / 180.0;
 }
 
+static unsigned long x=123456789, y=362436069, z=521288629;
+
 inline float random_float() {
   static std::uniform_real_distribution<float> distribution(0.0, 1.0);
   static std::mt19937 generator;
