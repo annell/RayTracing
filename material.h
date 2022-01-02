@@ -87,3 +87,19 @@ private:
     return r0 + (1-r0)*pow((1 - cosine),5);
   }
 };
+
+class emissive : public material {
+public:
+  emissive(const color& c, float intensity) : color(c), intensity(intensity) {}
+
+  virtual bool scatter(
+      const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+  ) const override {
+    attenuation = color * intensity;
+    return false;
+  }
+
+public:
+  color color;
+  float intensity;
+};
