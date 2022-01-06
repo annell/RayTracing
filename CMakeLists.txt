@@ -7,4 +7,4 @@ add_executable(RayTracing
         main.cpp
         sphere.cpp
         hittable_list.cpp
-        camera.cpp camera.h material.h)
+        camera.cpp camera.h material.h cube.cpp cube.h)

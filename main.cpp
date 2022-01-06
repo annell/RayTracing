@@ -1,10 +1,11 @@
 #include "rtweekend.h"
 
-#include "color.h"
-#include "hittable_list.h"
-#include "sphere.h"
 #include "camera.h"
+#include "color.h"
+#include "cube.h"
+#include "hittable_list.h"
 #include "material.h"
+#include "sphere.h"
 #include <future>
 
 color ray_color(const ray& r, const hittable& world , int depth) {
@@ -24,7 +25,7 @@ color ray_color(const ray& r, const hittable& world , int depth) {
   vec3 unit_direction = unit_vector(r.direction());
   float t = 0.5 * (unit_direction.y() + 1.0);
 
-  return color(0, 0, 0);
+  //return color(0, 0, 0);
   return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 
@@ -45,7 +46,7 @@ hittable_list random_scene() {
         if (choose_mat < 0.7) {
           auto albedo = color::random() * color::random();
           sphere_material = std::make_shared<emissive>(albedo, random_float(0.5, 2));
-          world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+          world.add(std::make_shared<cube>(center, 0.2, sphere_material));
         }
         else if (choose_mat < 0.8) {
           // diffuse
@@ -68,12 +69,11 @@ hittable_list random_scene() {
   }
 
   auto material1 = std::make_shared<emissive>(color(1.0, 0.4, 0.4), 10);
-  world.add(std::make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
-
   auto material2 = std::make_shared<lambertian>(color(0.4, 0.2, 0.1));
-  world.add(std::make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
-
   auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+
+  world.add(std::make_shared<sphere>(point3(0, 1, 0), 1.0, material2));
+  world.add(std::make_shared<cube>(point3(-4, 1, 0), 1.0, material1));
   world.add(std::make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
   return world;
@@ -82,10 +82,10 @@ hittable_list random_scene() {
 int main() {
   // Image
   const float aspect_ratio = 3.0 / 2.0;
-  const int image_width = 1280;
+  const int image_width = 400;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 500;
-  const int max_depth = 10;
+  const int samples_per_pixel = 100;
+  const int max_depth = 5;
 
   // World
   hittable_list world = random_scene();
