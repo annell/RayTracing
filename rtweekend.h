@@ -15,8 +15,6 @@ inline double degrees_to_radians(float degrees) {
   return degrees * pi / 180.0;
 }
 
-static unsigned long x=123456789, y=362436069, z=521288629;
-
 inline float random_float() {
   static std::uniform_real_distribution<float> distribution(0.0, 1.0);
   static std::mt19937 generator;
@@ -31,6 +29,11 @@ inline float clamp(float x, float min, float max) {
   if (x < min) return min;
   if (x > max) return max;
   return x;
+}
+
+template <typename T>
+inline bool equal(T a, T b) {
+  return std::abs(a - b) < std::numeric_limits<T>::epsilon();
 }
 
 #include "ray.h"

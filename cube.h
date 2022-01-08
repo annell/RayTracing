@@ -16,9 +16,10 @@ public:
     setCorners(center, side);
   }
 
-  bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
+  bool hit(const ray&ray, float t_min, float t_max, hit_record& rec) const override;
 private:
   void setCorners(const point3& center, float side);
+  vec3 normalAt(const vec3& point) const;
 public:
   point3 center;
   point3 leftBottom;

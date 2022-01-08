@@ -25,15 +25,14 @@ color ray_color(const ray& r, const hittable& world , int depth) {
   vec3 unit_direction = unit_vector(r.direction());
   float t = 0.5 * (unit_direction.y() + 1.0);
 
-  //return color(0, 0, 0);
-  return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+  return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.1, 0.3, 0.6);
 }
 
 hittable_list random_scene() {
   hittable_list world;
 
   auto ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
-  world.add(std::make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
+  world.add(std::make_shared<cube>(point3(0,-1000,0), 1000, ground_material));
 
   for (int a = -1; a < 11; a++) {
     for (int b = -1; b < 11; b++) {
@@ -45,20 +44,20 @@ hittable_list random_scene() {
 
         if (choose_mat < 0.7) {
           auto albedo = color::random() * color::random();
-          sphere_material = std::make_shared<emissive>(albedo, random_float(0.5, 2));
+          sphere_material = std::make_shared<lambertian>(albedo);
           world.add(std::make_shared<cube>(center, 0.2, sphere_material));
         }
         else if (choose_mat < 0.8) {
-          // diffuse
+          // emissive
           auto albedo = color::random() * color::random();
-          sphere_material = std::make_shared<lambertian>(albedo);
+          sphere_material = std::make_shared<emissive>(albedo, random_float(0.5, 10));
           world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
         } else if (choose_mat < 0.95) {
           // metal
           auto albedo = color::random(0.5, 1);
           auto fuzz = random_float(0, 0.5);
           sphere_material = std::make_shared<metal>(albedo, fuzz);
-          world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+          world.add(std::make_shared<cube>(center, 0.2, sphere_material));
         } else {
           // glass
           sphere_material = std::make_shared<dielectric>(1.5);
@@ -71,10 +70,11 @@ hittable_list random_scene() {
   auto material1 = std::make_shared<emissive>(color(1.0, 0.4, 0.4), 10);
   auto material2 = std::make_shared<lambertian>(color(0.4, 0.2, 0.1));
   auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+  auto material4 = std::make_shared<dielectric>(1.5);
 
-  world.add(std::make_shared<sphere>(point3(0, 1, 0), 1.0, material2));
   world.add(std::make_shared<cube>(point3(-4, 1, 0), 1.0, material1));
-  world.add(std::make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+  world.add(std::make_shared<cube>(point3(0, 1, 0), 1.0, material3));
+  world.add(std::make_shared<cube>(point3(4, 1, 0), 1.0, material3));
 
   return world;
 }
