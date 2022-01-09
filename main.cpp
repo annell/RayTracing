@@ -25,7 +25,7 @@ color ray_color(const ray& r, const hittable& world , int depth) {
   vec3 unit_direction = unit_vector(r.direction());
   float t = 0.5 * (unit_direction.y() + 1.0);
 
-  return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.1, 0.3, 0.6);
+  return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.1, 0.1, 0.1);
 }
 
 hittable_list random_scene() {
@@ -79,26 +79,25 @@ hittable_list random_scene() {
   return world;
 }
 
-int main() {
-  // Image
-  const float aspect_ratio = 3.0 / 2.0;
-  const int image_width = 400;
-  const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 100;
-  const int max_depth = 5;
+const float aspect_ratio = 3.0 / 2.0;
+const int image_width = 400;
+const int image_height = static_cast<int>(image_width / aspect_ratio);
+const int samples_per_pixel = 100;
+const int max_depth = 5;
 
-  // World
-  hittable_list world = random_scene();
+// World
+hittable_list world = random_scene();
 
-  // Camera
-  point3 lookfrom(13,2,3);
-  point3 lookat(0,0,0);
-  vec3 vup(0,1,0);
-  auto dist_to_focus = 10.0;
-  auto aperture = 0.1;
+// Camera
+point3 lookfrom(13,2,3);
+point3 lookat(0,0,0);
+vec3 vup(0,1,0);
+auto dist_to_focus = 10.0;
+auto aperture = 0.1;
 
-  camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
+void cpuRendering() {
   using std::chrono::high_resolution_clock;
   using std::chrono::duration;
   using std::chrono::milliseconds;
@@ -138,6 +137,61 @@ int main() {
   duration<double, std::milli> ms_double = t2 - t1;
   std::cerr << std::endl << "Done!" << std::endl;
   std::cerr << ms_double.count() << "ms\n";
+}
+
+
+#define NS_PRIVATE_IMPLEMENTATION
+#define MTL_PRIVATE_IMPLEMENTATION
+#include "external/Metal/Metal.hpp"
+#include "simd/vector_types.h"
+
+void gpuCompute() {
+
+  auto device = MTLCreateSystemDefaultDevice();
+  auto commandQueue = device->newCommandQueue();
+  const char* path = "../Shader/compute.metallib";
+  NS::Error* error = nullptr;
+  auto library = device->newLibrary(NS::String::string(path, NS::ASCIIStringEncoding), &error);
+
+  auto commandBuffer = commandQueue->commandBuffer();
+  auto encoder = commandBuffer->computeCommandEncoder();
+
+  auto addFunction = library->newFunction(NS::String::string("add", NS::ASCIIStringEncoding));
+  auto computePipelineState = device->newComputePipelineState(addFunction, &error);
+
+  encoder->setComputePipelineState(computePipelineState);
+
+  simd::float2 input = {501.2, 22.4};
+  std::cout << "input: " << input.x << " " << input.y << std::endl;
+  std::cout << "float2: " << sizeof(simd::float2) << std::endl;
+
+  auto inputBuffer = device->newBuffer(&input, 1 * sizeof(simd::float2), 0);
+  encoder->setBuffer(
+      inputBuffer,
+      0,
+      0
+      );
+
+  auto outputBuffer = device->newBuffer(1 * sizeof(simd::float1), 0);
+  encoder->setBuffer(outputBuffer, 0, 1);
+
+  auto numThreadGroups = MTL::Size(1, 1, 1);
+  auto threadsPerThreadgroup = MTL::Size(1, 1, 1);
+
+  encoder->dispatchThreadgroups(numThreadGroups, threadsPerThreadgroup);
+  encoder->endEncoding();
+
+  commandBuffer->commit();
+  commandBuffer->waitUntilCompleted();
+
+  void* result = outputBuffer->contents();
+  float* data = (float*)result;
+  std::cout << *data << std::endl;
+}
+
+int main() {
+  //cpuRendering();
+  gpuCompute();
 
   return 0;
 }
